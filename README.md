@@ -87,25 +87,48 @@ Optional, only for the widgets that use them:
 
 ## Install
 
-1. Clone this repository, then link (or copy) the plugin folder into OpenDeck's
-   plugin directory. A junction keeps it in place and easy to update:
+This is a Python plugin, so do the **Requirements** above first — without Python
+and the packages the plugin still installs, but the buttons stay blank.
 
-   ```bat
-   git clone https://github.com/avionbg/opendeck-widget-runner.git
-   mklink /J "%APPDATA%\com.elgato.StreamDeck\Plugins\com.goran.widgetrunner.sdPlugin" "C:\path\to\opendeck-widget-runner\com.goran.widgetrunner.sdPlugin"
+### Through OpenDeck (recommended)
+
+1. Get the plugin, either way:
+   - In OpenDeck's plugin manager choose **install from GitHub** and enter
+     `avionbg/opendeck-widget-runner`, then pick the
+     `com.goran.widgetrunner.streamDeckPlugin` asset; or
+   - download that `.streamDeckPlugin` from the
+     [Releases](https://github.com/avionbg/opendeck-widget-runner/releases) page
+     and install it as a local file.
+2. OpenDeck unpacks it into its plugins folder, typically:
+
+   ```
+   %APPDATA%\com.elgato.StreamDeck\Plugins\com.goran.widgetrunner.sdPlugin
    ```
 
-   (OpenDeck reads Stream Deck plugins from the same location. Check your
-   OpenDeck build for the exact plugins path if it differs.)
-
-2. The plugin launches through `run.cmd`, which points at a Python
-   interpreter. Edit it to match your install if needed:
+3. `run.cmd` launches the plugin and finds Python automatically — a `C:\Python3`
+   install, `pythonw` on `PATH`, or the `py` launcher. If yours is elsewhere,
+   open `run.cmd` and set the path in its first step:
 
    ```bat
    "C:\Python3\pythonw.exe" "%~dp0runner.py" %*
    ```
 
-3. Restart OpenDeck and drag any Widget Runner action onto a key.
+4. Optionally create `userconfig.py` in that folder for your own paths — see
+   **Configuration** below.
+5. Restart OpenDeck and drag any Widget Runner action onto a key.
+
+### From source (for development)
+
+Clone the repo and link the plugin folder into OpenDeck's plugins directory with
+a junction, so your edits are picked up in place:
+
+```bat
+git clone https://github.com/avionbg/opendeck-widget-runner.git
+mklink /J "%APPDATA%\com.elgato.StreamDeck\Plugins\com.goran.widgetrunner.sdPlugin" "C:\path\to\opendeck-widget-runner\com.goran.widgetrunner.sdPlugin"
+```
+
+Then edit `run.cmd` for your Python path and restart OpenDeck. (OpenDeck reads
+Stream Deck plugins from this location; check your build if the path differs.)
 
 ## Configuration
 
