@@ -182,7 +182,17 @@ class NowPlaying(Widget):
                 smtc_playing = s.get_playback_info().playback_status.name == "PLAYING"
             except Exception:
                 smtc_playing = False
-        if not smtc_playing and await self._radio_fallback():
+        radio_ok = (not smtc_playing) and await self._radio_fallback()
+        if log.isEnabledFor(logging.DEBUG):
+            try:
+                from widgets.radio import radio_now_playing as _rnp
+                _np = _rnp()
+            except Exception as _e:
+                _np = f"<err {_e}>"
+            log.debug("NP poll: smtc_playing=%s radio_ok=%s radio_np=%r cur_session=%s",
+                      smtc_playing, radio_ok, _np,
+                      (s.source_app_user_model_id if s is not None else None))
+        if radio_ok:
             self._from_radio = True
             return
         self._from_radio = False

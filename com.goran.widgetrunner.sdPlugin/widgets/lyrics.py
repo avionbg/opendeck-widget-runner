@@ -166,6 +166,8 @@ class Lyrics(Widget):
         self.index = -2
         self.status = "none"
         self._fetching = None
+        self._radio_key = None       # last (title, artist) seen from the radio
+        self._radio_start = 0.0      # monotonic time the radio song last changed (position estimate)
 
     CONFIG_KEYS = ("width_pct", "height_pct", "position", "font_pct", "text_color", "bg_color", "bg_opacity")
 
@@ -206,26 +208,61 @@ class Lyrics(Widget):
             cls._manager = await asyncio.wait_for(_Mgr.request_async(), WINRT_TIMEOUT)
         return cls._manager
 
+    def _radio_np(self):
+        """Radio (mpv) 'now playing' with an estimated position, or None.
+
+        mpv registers no Windows media session, so the SMTC read never sees the radio. Stations
+        refresh the ICY title at each song's start, so the moment the title changes approximates
+        the song start; position is the elapsed time since then (good enough to follow LRC lines)."""
+        try:
+            from widgets.radio import radio_now_playing
+            np = radio_now_playing()
+        except Exception:
+            return None
+        if not np:
+            return None
+        title, artist = (np.get("title") or "").strip(), (np.get("artist") or "").strip()
+        if not title:
+            return None
+        key = (title, artist)
+        now = time.monotonic()
+        if key != self._radio_key:
+            self._radio_key = key
+            self._radio_start = now
+        return title, artist, now - self._radio_start
+
     async def now_playing(self):
-        """-> (title, artist, duration, position, playing) or None"""
+        """-> (title, artist, duration, position, playing) or None.
+
+        Prefers an app that is actively playing; otherwise falls back to the internet radio,
+        and finally to a paused app so its lyrics stay on screen."""
+        s = None
+        smtc = None
+        smtc_playing = False
         try:
             s = (await self.manager()).get_current_session()
-            if s is None:
-                return None
-            p = await asyncio.wait_for(s.try_get_media_properties_async(), WINRT_TIMEOUT)
-            pb, tl = s.get_playback_info(), s.get_timeline_properties()
-            pos = tl.position.total_seconds()
-            playing = pb.playback_status.name == "PLAYING"
-            if playing:
-                try:
-                    pos += time.time() - tl.last_updated_time.timestamp()
-                except Exception:
-                    pass
-            return p.title or "", p.artist or "", tl.end_time.total_seconds(), pos, playing
+            if s is not None:
+                p = await asyncio.wait_for(s.try_get_media_properties_async(), WINRT_TIMEOUT)
+                pb, tl = s.get_playback_info(), s.get_timeline_properties()
+                smtc_playing = pb.playback_status.name == "PLAYING"
+                pos = tl.position.total_seconds()
+                if smtc_playing:
+                    try:
+                        pos += time.time() - tl.last_updated_time.timestamp()
+                    except Exception:
+                        pass
+                smtc = (p.title or "", p.artist or "", tl.end_time.total_seconds(), pos, smtc_playing)
         except Exception as e:
             log.debug("media query failed: %s", e)
             Lyrics._manager = None
-            return None
+            s = smtc = None
+        if smtc is not None and smtc_playing:
+            return smtc
+        radio = self._radio_np()
+        if radio is not None:
+            title, artist, pos = radio
+            return title, artist, 0.0, pos, True
+        return smtc  # a paused app (or None when nothing is playing at all)
 
     # --- main loop -------------------------------------------------------
     async def _loop(self):
