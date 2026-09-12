@@ -2,7 +2,7 @@
 	"Name": "Widget Runner",
 	"Description": "One Python process hosting many widgets",
 	"Author": "Goran",
-	"Version": "0.1.0",
+	"Version": "0.1.1",
 	"PluginUUID": "com.goran.widgetrunner",
 	"CodePathWin": "run.cmd",
 	"Icon": "icons/plugin",
