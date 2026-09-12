@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Usage settings</title>
+<style>
+  body { font-family: system-ui, sans-serif; font-size: 13px; color: #ddd; background: transparent; margin: 8px; }
+  label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  input[type=checkbox] { width: 16px; height: 16px; }
+  .hint { margin-top: 6px; color: #777; font-size: 11px; }
+</style>
+</head>
+<body>
+  <label><input id="show_name" type="checkbox"> Show name (Claude / Codex) above the bars</label>
+  <div class="hint">Refreshes every 5 minutes; pressing the key refreshes at most once a minute.</div>
+
+<script>
+  let ws = null, ctx = null, settings = {};
+  const box = document.getElementById("show_name");
+
+  function connectElgatoStreamDeckSocket(port, uuid, registerEvent, info, actionInfo) {
+    ctx = uuid;
+    try { settings = JSON.parse(actionInfo).payload.settings || {}; } catch (e) { settings = {}; }
+    box.checked = !!settings.show_name;
+    ws = new WebSocket("ws://127.0.0.1:" + port);
+    ws.onopen = () => ws.send(JSON.stringify({ event: registerEvent, uuid }));
+  }
+
+  box.addEventListener("change", () => {
+    if (!ws || ws.readyState !== 1) return;
+    settings.show_name = box.checked;
+    ws.send(JSON.stringify({ event: "setSettings", context: ctx, payload: settings }));
+  });
+</script>
+</body>
+</html>

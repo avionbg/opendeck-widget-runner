@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Radio settings</title>
+<style>
+  body { font-family: system-ui, sans-serif; font-size: 13px; color: #ddd; background: transparent; margin: 8px; }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .row span { width: 110px; color: #aaa; }
+  input, select { flex: 1; padding: 5px 8px; border-radius: 4px; border: 1px solid #555; background: #2a2a2a; color: #eee; font-size: 13px; }
+  input[type=color] { flex: none; width: 44px; height: 28px; padding: 0; }
+  h4 { margin: 12px 0 6px; color: #bbb; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  .hint { margin-top: 4px; color: #777; font-size: 11px; line-height: 1.4; }
+</style>
+</head>
+<body>
+  <div class="row"><span>Starting source</span><select id="source"><option value="playlist">Playlist (.m3u)</option><option value="favorites">Favorites</option><option value="search">Search (radio-browser)</option></select></div>
+  <h4>Playlist</h4>
+  <div class="row"><span>.m3u file</span><input id="m3u_path" placeholder="C:\path\to\stations.m3u"></div>
+  <div class="row"><span>Group</span><input id="m3u_group" placeholder="My stations (empty = all groups)"></div>
+  <h4>Favorites</h4>
+  <div class="row"><span>favorites .m3u</span><input id="fav_path" placeholder="favorites.m3u next to the plugin"></div>
+  <div class="row"><span>blacklist .m3u</span><input id="bl_path" placeholder="blacklist.m3u next to the plugin"></div>
+  <h4>Search</h4>
+  <div class="row"><span>Country code</span><input id="rb_country" placeholder="RS"></div>
+  <div class="row"><span>Tag / genre</span><input id="rb_tag" placeholder="e.g. pop, rock, jazz, news"></div>
+  <div class="row"><span>Name contains</span><input id="rb_name" placeholder="optional"></div>
+  <div class="row"><span>Max stations</span><input id="rb_limit" type="number" min="1" max="100" placeholder="20"></div>
+  <h4>Player</h4>
+  <div class="row"><span>If something plays</span><select id="busy_action"><option value="skip">Don't start the radio</option><option value="replace">Pause it, then play the radio</option><option value="ignore">Always start the radio</option></select></div>
+  <div class="row"><span>mpv path</span><input id="mpv_path" placeholder="C:\path\to\mpv.exe"></div>
+  <div class="row"><span>Resume</span><label style="flex:1"><input id="resume" type="checkbox" style="width:16px;height:16px;flex:none"> Play the last station when the widget starts</label></div>
+  <h4>On-screen menu</h4>
+  <div class="row"><span>Horizontal</span><select id="menu_align"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+  <div class="row"><span>Vertical</span><select id="menu_position"><option value="top">Top</option><option value="middle">Middle</option><option value="bottom">Bottom</option></select></div>
+  <div class="row"><span>Width (%)</span><input id="menu_width_pct" type="number" min="10" max="100" step="2" placeholder="26"></div>
+  <div class="row"><span>Height (%)</span><input id="menu_height_pct" type="number" min="20" max="100" step="4" placeholder="56"></div>
+  <div class="row"><span>Font (% of screen)</span><input id="menu_font_pct" type="number" min="1" max="6" step="0.1" placeholder="1.7"></div>
+  <div class="row"><span>Text colour</span><input id="menu_text_color" type="color" value="#ffffff"></div>
+  <div class="row"><span>Background colour</span><input id="menu_bg_color" type="color" value="#0b0d14"></div>
+  <div class="row"><span>Background opacity (%)</span><input id="menu_bg_opacity" type="number" min="0" max="100" step="5" placeholder="88"></div>
+  <div class="hint">Key: press = play / stop, double press = add / remove favorite, hold 1 s = actions menu (Stations…, favorite, source). Dial: rotate = previous / next station or menu row, press = play / stop or select. The last station of each source is remembered.</div>
+<script>
+  let ws = null, ctx = null, settings = {};
+  const ids = ["source", "m3u_path", "m3u_group", "fav_path", "bl_path", "rb_country", "rb_tag", "rb_name", "rb_limit", "mpv_path", "busy_action", "resume",
+               "menu_align", "menu_position", "menu_width_pct", "menu_height_pct", "menu_font_pct", "menu_text_color", "menu_bg_color", "menu_bg_opacity"];
+  const defaults = { source: "playlist", busy_action: "skip", menu_align: "right", menu_position: "middle" };
+  const el = Object.fromEntries(ids.map(i => [i, document.getElementById(i)]));
+  function connectElgatoStreamDeckSocket(port, uuid, registerEvent, info, actionInfo) {
+    ctx = uuid;
+    try { settings = JSON.parse(actionInfo).payload.settings || {}; } catch (e) { settings = {}; }
+    ids.forEach(i => {
+      const v = settings[i];
+      if (el[i].type === "checkbox") el[i].checked = !!v;
+      else if (v !== undefined && v !== null) el[i].value = v;
+      else if (defaults[i]) el[i].value = defaults[i];
+    });
+    ws = new WebSocket("ws://127.0.0.1:" + port);
+    ws.onopen = () => ws.send(JSON.stringify({ event: registerEvent, uuid }));
+    ws.onmessage = (e) => { const d = JSON.parse(e.data); if (d.event === "didReceiveSettings") { settings = d.payload.settings || {}; el.source.value = settings.source || "playlist"; } };
+  }
+  function save() {
+    if (!ws || ws.readyState !== 1) return;
+    ids.forEach(i => {
+      if (el[i].type === "checkbox") { settings[i] = el[i].checked; return; }
+      const v = el[i].value;
+      settings[i] = (el[i].type !== "color" && v.trim() === "") ? undefined : (el[i].type === "number" ? Number(v) : v);
+    });
+    ws.send(JSON.stringify({ event: "setSettings", context: ctx, payload: settings }));
+  }
+  ids.forEach(i => el[i].addEventListener("change", save));
+</script>
+</body>
+</html>

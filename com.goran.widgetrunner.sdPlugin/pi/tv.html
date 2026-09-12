@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Open on TV settings</title>
+<style>
+  body { font-family: system-ui, sans-serif; font-size: 13px; color: #ddd; background: transparent; margin: 8px; }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .row span { width: 110px; color: #aaa; }
+  select { padding: 5px 8px; border-radius: 4px; border: 1px solid #555; background: #2a2a2a; color: #eee; font-size: 13px; }
+  input { flex: 1; padding: 5px 8px; border-radius: 4px; border: 1px solid #555; background: #2a2a2a; color: #eee; font-size: 13px; }
+  .hint { margin-top: 4px; color: #777; font-size: 11px; line-height: 1.4; }
+</style>
+</head>
+<body>
+  <div class="row"><span>TV name</span><input id="tv_name" placeholder="Mazinga_TV"></div>
+  <div class="row"><span>TV address</span><input id="tv_ip" placeholder="192.168.1.50"></div>
+  <div class="row"><span>Open with</span><select id="app"><option value="auto">Auto (SmartTube, else YouTube)</option><option value="smarttube">SmartTube</option><option value="youtube">YouTube</option><option value="chooser">Ask on the TV</option></select></div>
+  <div class="row"><span>Custom package</span><input id="package" placeholder="optional, overrides the choice above"></div>
+  <div class="row"><span>adb path</span><input id="adb_path" placeholder="auto"></div>
+  <div class="hint">The TV needs network debugging enabled and this PC allowed. Press: find the playing video on YouTube and open it on the TV.</div>
+<script>
+  let ws = null, ctx = null, settings = {};
+  const ids = ["tv_name", "tv_ip", "app", "package", "adb_path"];
+  const el = Object.fromEntries(ids.map(i => [i, document.getElementById(i)]));
+  function connectElgatoStreamDeckSocket(port, uuid, registerEvent, info, actionInfo) {
+    ctx = uuid;
+    try { settings = JSON.parse(actionInfo).payload.settings || {}; } catch (e) { settings = {}; }
+    ids.forEach(i => { el[i].value = settings[i] || (i === "app" ? "auto" : ""); });
+    ws = new WebSocket("ws://127.0.0.1:" + port);
+    ws.onopen = () => ws.send(JSON.stringify({ event: registerEvent, uuid }));
+  }
+  function save() {
+    if (!ws || ws.readyState !== 1) return;
+    ids.forEach(i => { settings[i] = el[i].value.trim() || undefined; });
+    ws.send(JSON.stringify({ event: "setSettings", context: ctx, payload: settings }));
+  }
+  ids.forEach(i => el[i].addEventListener("change", save));
+</script>
+</body>
+</html>

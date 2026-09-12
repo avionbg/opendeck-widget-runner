@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Zoom settings</title>
+<style>
+  body { font-family: system-ui, sans-serif; font-size: 13px; color: #ddd; background: transparent; margin: 8px; }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .row span { width: 110px; color: #aaa; }
+  select { padding: 5px 8px; border-radius: 4px; border: 1px solid #555; background: #2a2a2a; color: #eee; font-size: 13px; }
+  input[type=number] { width: 70px; padding: 5px 8px; border-radius: 4px; border: 1px solid #555; background: #2a2a2a; color: #eee; font-size: 13px; }
+  label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .hint { margin-top: 4px; color: #777; font-size: 11px; line-height: 1.4; }
+</style>
+</head>
+<body>
+  <div class="row"><span>Zoom level (key)</span><input id="level" type="number" min="1.25" max="8" step="0.25" placeholder="2"></div>
+  <div class="row"><span>Dial step</span><input id="step" type="number" min="0.1" max="2" step="0.05" placeholder="0.25"></div>
+  <div class="row"><span>Follow mouse</span><select id="follow"><option value="edge">Pan at screen edge (Magnifier default)</option><option value="center">Keep cursor centred</option><option value="off">Off</option></select></div>
+  <div class="hint">Key or dial press: toggle zoom. Dial rotate: zoom in/out in steps. Uses the Windows Magnification API, no Magnifier window.</div>
+
+<script>
+  let ws = null, ctx = null, settings = {};
+  const level = document.getElementById("level"), step = document.getElementById("step"), follow = document.getElementById("follow");
+
+  function connectElgatoStreamDeckSocket(port, uuid, registerEvent, info, actionInfo) {
+    ctx = uuid;
+    try { settings = JSON.parse(actionInfo).payload.settings || {}; } catch (e) { settings = {}; }
+    level.value = settings.level || "";
+    step.value = settings.step || "";
+    follow.value = settings.follow || "edge";
+    ws = new WebSocket("ws://127.0.0.1:" + port);
+    ws.onopen = () => ws.send(JSON.stringify({ event: registerEvent, uuid }));
+  }
+
+  function save() {
+    if (!ws || ws.readyState !== 1) return;
+    settings.level = level.value ? Number(level.value) : undefined;
+    settings.step = step.value ? Number(step.value) : undefined;
+    settings.follow = follow.value;
+    ws.send(JSON.stringify({ event: "setSettings", context: ctx, payload: settings }));
+  }
+  [level, step, follow].forEach(el => el.addEventListener("change", save));
+</script>
+</body>
+</html>

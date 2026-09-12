@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Beat pulse settings</title>
+<style>
+  body { font-family: system-ui, sans-serif; font-size: 13px; color: #ddd; background: transparent; margin: 8px; }
+  label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  input[type=checkbox] { width: 16px; height: 16px; }
+  .hint { margin-top: 6px; color: #777; font-size: 11px; }
+</style>
+</head>
+<body>
+  <label><input id="show_bpm" type="checkbox"> Show BPM</label>
+  <div class="hint">Off: the pulsing dot fills the whole key. Pressing the key resets the BPM estimate.</div>
+<script>
+  let ws = null, ctx = null, settings = {};
+  const box = document.getElementById("show_bpm");
+  function connectElgatoStreamDeckSocket(port, uuid, registerEvent, info, actionInfo) {
+    ctx = uuid;
+    try { settings = JSON.parse(actionInfo).payload.settings || {}; } catch (e) { settings = {}; }
+    box.checked = settings.show_bpm === undefined ? true : !!settings.show_bpm;
+    ws = new WebSocket("ws://127.0.0.1:" + port);
+    ws.onopen = () => ws.send(JSON.stringify({ event: registerEvent, uuid }));
+  }
+  box.addEventListener("change", () => {
+    if (!ws || ws.readyState !== 1) return;
+    settings.show_bpm = box.checked;
+    ws.send(JSON.stringify({ event: "setSettings", context: ctx, payload: settings }));
+  });
+</script>
+</body>
+</html>

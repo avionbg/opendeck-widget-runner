@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Weather settings</title>
+<style>
+  body { font-family: system-ui, sans-serif; font-size: 13px; color: #ddd; background: transparent; margin: 8px; }
+  label { display: block; margin-bottom: 4px; color: #aaa; }
+  input { width: 100%; box-sizing: border-box; padding: 6px 8px; border-radius: 4px; border: 1px solid #555;
+          background: #2a2a2a; color: #eee; font-size: 13px; }
+  .hint { margin-top: 6px; color: #777; font-size: 11px; }
+</style>
+</head>
+<body>
+  <label for="city">City</label>
+  <input id="city" type="text" placeholder="Belgrade" autocomplete="off">
+  <div class="hint">Any city name; resolved via Open-Meteo geocoding. Press the key to refresh.</div>
+
+<script>
+  let ws = null, ctx = null, settings = {};
+  const input = document.getElementById("city");
+
+  // OpenDeck / Stream Deck call this global once the PI page is loaded.
+  function connectElgatoStreamDeckSocket(port, uuid, registerEvent, info, actionInfo) {
+    ctx = uuid;
+    try { settings = JSON.parse(actionInfo).payload.settings || {}; } catch (e) { settings = {}; }
+    input.value = settings.city || "";
+    ws = new WebSocket("ws://127.0.0.1:" + port);
+    ws.onopen = () => ws.send(JSON.stringify({ event: registerEvent, uuid }));
+  }
+
+  let timer = null;
+  input.addEventListener("input", () => {
+    clearTimeout(timer);
+    timer = setTimeout(save, 600);   // debounce typing
+  });
+  input.addEventListener("change", save);
+
+  function save() {
+    if (!ws || ws.readyState !== 1) return;
+    settings.city = input.value.trim();
+    ws.send(JSON.stringify({ event: "setSettings", context: ctx, payload: settings }));
+  }
+</script>
+</body>
+</html>

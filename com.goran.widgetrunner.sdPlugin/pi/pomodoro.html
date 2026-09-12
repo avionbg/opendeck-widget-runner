@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Pomodoro settings</title>
+<style>
+  body { font-family: system-ui, sans-serif; font-size: 13px; color: #ddd; background: transparent; margin: 8px; }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .row span { width: 90px; color: #aaa; }
+  input[type=number] { width: 70px; padding: 5px 8px; border-radius: 4px; border: 1px solid #555; background: #2a2a2a; color: #eee; font-size: 13px; }
+  label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .hint { margin-top: 4px; color: #777; font-size: 11px; line-height: 1.4; }
+</style>
+</head>
+<body>
+  <div class="row"><span>Focus (min)</span><input id="focus_min" type="number" min="1" max="180" placeholder="25"></div>
+  <div class="row"><span>Break (min)</span><input id="break_min" type="number" min="1" max="60" placeholder="5"></div>
+  <div class="row"><label><input id="sound" type="checkbox"> Beep when a phase ends</label></div>
+  <div class="hint">Press: start / pause / resume. Hold for a second: reset.</div>
+
+<script>
+  let ws = null, ctx = null, settings = {};
+  const focus = document.getElementById("focus_min"), brk = document.getElementById("break_min"), sound = document.getElementById("sound");
+
+  function connectElgatoStreamDeckSocket(port, uuid, registerEvent, info, actionInfo) {
+    ctx = uuid;
+    try { settings = JSON.parse(actionInfo).payload.settings || {}; } catch (e) { settings = {}; }
+    focus.value = settings.focus_min || "";
+    brk.value = settings.break_min || "";
+    sound.checked = settings.sound === undefined ? true : !!settings.sound;
+    ws = new WebSocket("ws://127.0.0.1:" + port);
+    ws.onopen = () => ws.send(JSON.stringify({ event: registerEvent, uuid }));
+  }
+
+  function save() {
+    if (!ws || ws.readyState !== 1) return;
+    settings.focus_min = focus.value ? Number(focus.value) : undefined;
+    settings.break_min = brk.value ? Number(brk.value) : undefined;
+    settings.sound = sound.checked;
+    ws.send(JSON.stringify({ event: "setSettings", context: ctx, payload: settings }));
+  }
+  [focus, brk].forEach(el => el.addEventListener("change", save));
+  sound.addEventListener("change", save);
+</script>
+</body>
+</html>

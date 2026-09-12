@@ -1,0 +1,440 @@
+{
+	"Name": "Widget Runner",
+	"Description": "One Python process hosting many widgets",
+	"Author": "Goran",
+	"Version": "0.1.0",
+	"PluginUUID": "com.goran.widgetrunner",
+	"CodePathWin": "run.cmd",
+	"Icon": "icons/plugin",
+	"Category": "Widget Runner",
+	"OS": [
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		}
+	],
+	"Actions": [
+		{
+			"Icon": "icons/clock",
+			"Name": "Clock",
+			"States": [
+				{
+					"Image": "icons/clock"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Analog + digital clock",
+			"UUID": "com.goran.widgetrunner.clock",
+			"PropertyInspectorPath": "pi/clock.html"
+		},
+		{
+			"Icon": "icons/weather",
+			"Name": "Weather",
+			"States": [
+				{
+					"Image": "icons/weather"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Current weather (Open-Meteo)",
+			"UUID": "com.goran.widgetrunner.weather",
+			"PropertyInspectorPath": "pi/weather.html"
+		},
+		{
+			"Icon": "icons/date",
+			"Name": "Date",
+			"States": [
+				{
+					"Image": "icons/date"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Today's date",
+			"UUID": "com.goran.widgetrunner.date",
+			"PropertyInspectorPath": "pi/date.html"
+		},
+		{
+			"Icon": "icons/usage",
+			"Name": "Claude Usage",
+			"States": [
+				{
+					"Image": "icons/usage"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Claude Code 5h / 7d usage limits",
+			"UUID": "com.goran.widgetrunner.usage",
+			"PropertyInspectorPath": "pi/usage.html"
+		},
+		{
+			"Icon": "icons/codex",
+			"Name": "Codex Usage",
+			"States": [
+				{
+					"Image": "icons/codex"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "OpenAI Codex 5h / 7d usage limits",
+			"UUID": "com.goran.widgetrunner.codex",
+			"PropertyInspectorPath": "pi/usage.html"
+		},
+		{
+			"Icon": "icons/monitor",
+			"Name": "System Monitor",
+			"States": [
+				{
+					"Image": "icons/monitor"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "CPU / RAM / GPU load; press opens Task Manager",
+			"UUID": "com.goran.widgetrunner.monitor"
+		},
+		{
+			"Icon": "icons/pomodoro",
+			"Name": "Pomodoro",
+			"States": [
+				{
+					"Image": "icons/pomodoro"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Focus/break timer: press start/pause, hold to reset",
+			"UUID": "com.goran.widgetrunner.pomodoro",
+			"PropertyInspectorPath": "pi/pomodoro.html"
+		},
+		{
+			"Icon": "icons/docker",
+			"Name": "Docker",
+			"States": [
+				{
+					"Image": "icons/docker"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Running containers; press opens Docker Desktop",
+			"UUID": "com.goran.widgetrunner.docker"
+		},
+		{
+			"Icon": "icons/mic",
+			"Name": "Mic Mute",
+			"States": [
+				{
+					"Image": "icons/mic"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Default microphone mute state; press toggles",
+			"UUID": "com.goran.widgetrunner.mic"
+		},
+		{
+			"Icon": "icons/fx",
+			"Name": "Exchange Rate",
+			"States": [
+				{
+					"Image": "icons/fx"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Currency rate (default EUR→RSD); press opens Google Finance",
+			"UUID": "com.goran.widgetrunner.fx",
+			"PropertyInspectorPath": "pi/fx.html"
+		},
+		{
+			"Icon": "icons/zoom",
+			"Name": "Zoom",
+			"States": [
+				{
+					"Image": "icons/zoom"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Screen zoom without the Magnifier window; key toggles, dial adjusts",
+			"UUID": "com.goran.widgetrunner.zoom",
+			"PropertyInspectorPath": "pi/zoom.html"
+		},
+		{
+			"Icon": "icons/audiolevel",
+			"Name": "Audio Level",
+			"States": [
+				{
+					"Image": "icons/audiolevel"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Stereo output level, L | R segmented meters",
+			"UUID": "com.goran.widgetrunner.audiolevel"
+		},
+		{
+			"Icon": "icons/spectrum",
+			"Name": "Spectrum",
+			"States": [
+				{
+					"Image": "icons/spectrum"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Real-time frequency spectrum of the output audio (WASAPI loopback + FFT)",
+			"UUID": "com.goran.widgetrunner.spectrum",
+			"PropertyInspectorPath": "pi/spectrum.html"
+		},
+		{
+			"Icon": "icons/nowplaying",
+			"Name": "Now Playing",
+			"States": [
+				{
+					"Image": "icons/nowplaying"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Current track from the browser / media app; press = play/pause, dial = prev/next",
+			"UUID": "com.goran.widgetrunner.nowplaying",
+			"PropertyInspectorPath": "pi/nowplaying.html"
+		},
+		{
+			"Icon": "icons/lyrics",
+			"Name": "Lyrics",
+			"States": [
+				{
+					"Image": "icons/lyrics"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Synced lyrics (LRCLIB) for the current track; press toggles the screen overlay",
+			"UUID": "com.goran.widgetrunner.lyrics",
+			"PropertyInspectorPath": "pi/lyrics.html"
+		},
+		{
+			"Icon": "icons/seek",
+			"Name": "Seek",
+			"States": [
+				{
+					"Image": "icons/seek"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Dial scrubs the current track; press = play/pause",
+			"UUID": "com.goran.widgetrunner.seek",
+			"PropertyInspectorPath": "pi/seek.html"
+		},
+		{
+			"Icon": "icons/sleeptimer",
+			"Name": "Sleep Timer",
+			"States": [
+				{
+					"Image": "icons/sleeptimer"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Pauses playback after 15/30/60 min; dial adjusts",
+			"UUID": "com.goran.widgetrunner.sleeptimer",
+			"PropertyInspectorPath": "pi/sleeptimer.html"
+		},
+		{
+			"Icon": "icons/beat",
+			"Name": "Beat Pulse",
+			"States": [
+				{
+					"Image": "icons/beat"
+				}
+			],
+			"Controllers": [
+				"Keypad"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Pulses on the beat of what is playing, shows BPM",
+			"UUID": "com.goran.widgetrunner.beat",
+			"PropertyInspectorPath": "pi/beat.html"
+		},
+		{
+			"Icon": "icons/appvolume",
+			"Name": "App Volume",
+			"States": [
+				{
+					"Image": "icons/appvolume"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Dial sets the volume of the app playing music; press mutes it",
+			"UUID": "com.goran.widgetrunner.appvolume",
+			"PropertyInspectorPath": "pi/appvolume.html"
+		},
+		{
+			"Icon": "icons/crossplay",
+			"Name": "Find on Spotify / YouTube",
+			"States": [
+				{
+					"Image": "icons/crossplay"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Search the current track on the other platform",
+			"UUID": "com.goran.widgetrunner.crossplay",
+			"PropertyInspectorPath": "pi/crossplay.html"
+		},
+		{
+			"Icon": "icons/playpause",
+			"Name": "Play / Pause",
+			"States": [
+				{
+					"Image": "icons/playpause"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Media play/pause (shows state)",
+			"UUID": "com.goran.widgetrunner.playpause"
+		},
+		{
+			"Icon": "icons/next",
+			"Name": "Next Track",
+			"States": [
+				{
+					"Image": "icons/next"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Media next",
+			"UUID": "com.goran.widgetrunner.next"
+		},
+		{
+			"Icon": "icons/prev",
+			"Name": "Previous Track",
+			"States": [
+				{
+					"Image": "icons/prev"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Media previous",
+			"UUID": "com.goran.widgetrunner.prev"
+		},
+		{
+			"Icon": "icons/trackinfo",
+			"Name": "Track Info",
+			"States": [
+				{
+					"Image": "icons/trackinfo"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Album / year / genre / cover from MusicBrainz; press toggles the on-screen card",
+			"UUID": "com.goran.widgetrunner.trackinfo",
+			"PropertyInspectorPath": "pi/trackinfo.html"
+		},
+		{
+			"Icon": "icons/tv",
+			"Name": "Open on TV",
+			"States": [
+				{
+					"Image": "icons/tv"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Send the current YouTube video to an Android TV (adb / SmartTube)",
+			"UUID": "com.goran.widgetrunner.tv",
+			"PropertyInspectorPath": "pi/tv.html"
+		},
+		{
+			"Icon": "icons/radio",
+			"Name": "Radio",
+			"States": [
+				{
+					"Image": "icons/radio"
+				}
+			],
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"SupportedInMultiActions": false,
+			"Tooltip": "Internet radio via mpv: playlist (.m3u) or radio-browser search; press play/stop, hold to switch source, dial picks stations",
+			"UUID": "com.goran.widgetrunner.radio",
+			"PropertyInspectorPath": "pi/radio.html"
+		}
+	]
+}

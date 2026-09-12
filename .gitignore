@@ -1,0 +1,22 @@
+# Personal, machine-specific overrides (copy userconfig.example.py to create your own)
+userconfig.py
+
+# User-generated radio lists
+favorites.m3u
+blacklist.m3u
+
+# Runtime logs and debug marker
+*.log
+*.log.*
+debug
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor / OS cruft
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
